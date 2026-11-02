@@ -1,0 +1,35 @@
+Use shared user data for shell cd directives; the snap has a private /tmp.
+
+--- a/templates/bash.sh
++++ b/templates/bash.sh
+@@ -27,7 +27,7 @@
+         if builtin declare -p PROMPT_COMMAND >/dev/null 2>&1; then prompt_declared=true; fi
+         # Readonly prompts cannot be replaced; allexport would export our callback.
+         if [[ $- == *a* ]] || ! (PROMPT_COMMAND="$prompt_value") 2>/dev/null; then prompt_armed=false; fi
+-        cd_file="$(mktemp)" || return
++        cd_file="$(mktemp "$HOME/snap/worktrunk/common/tmp/wt.XXXXXXXXXX")" || return
+         owner="_{{ cmd_ident }}_cleanup_${cd_file##*/}"
+         owner="${owner//[^a-zA-Z0-9_]/_}"
+         exit_trap="$(builtin trap -p EXIT)"
+--- a/templates/zsh.zsh
++++ b/templates/zsh.zsh
+@@ -25,7 +25,7 @@
+         fi
+ 
+         local cd_file exit_code=0
+-        cd_file="$(mktemp)"
++        cd_file="$(mktemp "$HOME/snap/worktrunk/common/tmp/wt.XXXXXXXXXX")"
+ 
+         local -a execution=("${WORKTRUNK_BIN:-{{ cmd }}}" "${args[@]}")
+         if [[ "$use_source" == true ]]; then
+--- a/templates/fish.fish
++++ b/templates/fish.fish
+@@ -18,7 +18,7 @@
+         echo "{{ cmd }}: command not found" >&2
+         return 127
+     end
+-    set -l cd_file (mktemp)
++    set -l cd_file (mktemp "$HOME/snap/worktrunk/common/tmp/wt.XXXXXXXXXX")
+ 
+     # Older fish unwinds only the function that directly launched an interrupted
+     # child. This boundary lets ordinary cleanup run before its caller continues.

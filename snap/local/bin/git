@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+export GIT_EXEC_PATH="$SNAP/usr/lib/git-core"
+exec "$SNAP/usr/lib/git-core/git" "$@"

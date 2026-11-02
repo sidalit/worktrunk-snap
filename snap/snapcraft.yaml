@@ -1,0 +1,87 @@
+name: worktrunk
+base: core26
+version: '0.81.0'
+title: Worktrunk
+icon: snap/gui/worktrunk.png
+summary: Manage Git worktrees from your terminal
+description: |
+  Worktrunk creates, lists, switches, merges and removes Git worktrees using
+  branch names. It includes an interactive picker, configurable worktree
+  paths and project hooks.
+
+  Git is included. Repositories must be in your home directory or on
+  connected removable media. Shell integration supports Bash, Zsh and Fish.
+  Host-installed agents, development tools, Git credentials and configuration
+  are not available inside this strictly confined snap.
+license: MIT OR Apache-2.0
+grade: stable
+confinement: strict
+website: https://worktrunk.dev
+source-code:
+  - https://github.com/max-sixty/worktrunk
+  - https://github.com/sidalit/worktrunk-snap
+issues:
+  - https://github.com/max-sixty/worktrunk/issues
+  - https://github.com/sidalit/worktrunk-snap/issues
+contact: https://github.com/sidalit/worktrunk-snap/issues
+
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  worktrunk:
+    command: bin/worktrunk-launch
+    environment: &environment
+      HOME: $SNAP_USER_COMMON
+      XDG_CONFIG_HOME: $SNAP_USER_COMMON/.config
+      XDG_CACHE_HOME: $SNAP_USER_COMMON/.cache
+      PATH: $SNAP/bin:$SNAP/usr/bin:$PATH
+    plugs:
+      - desktop
+      - home
+      - network
+      - removable-media
+      - wayland
+      - x11
+  git:
+    command: bin/git
+    environment: *environment
+    plugs:
+      - home
+      - network
+      - removable-media
+
+parts:
+  worktrunk:
+    plugin: rust
+    source: https://github.com/max-sixty/worktrunk.git
+    source-tag: v$SNAPCRAFT_PROJECT_VERSION
+    source-depth: 1
+    rust-channel: '1.98.0'
+    rust-cargo-parameters:
+      - --bin=wt
+      - --profile=dist
+    build-packages:
+      - build-essential
+      - git
+      - patch
+    override-pull: |
+      craftctl default
+      patch -p1 < "$CRAFT_PROJECT_DIR/snap/patches/shared-shell-directory.patch"
+    override-build: |
+      craftctl default
+      strip "$CRAFT_PART_INSTALL/bin/wt"
+      install -Dm644 LICENSE "$CRAFT_PART_INSTALL/share/doc/worktrunk/LICENSE"
+
+  git:
+    plugin: nil
+    build-attributes: [enable-patchelf]
+    stage-slices:
+      - git_bins
+      - git_http-support
+      - ca-certificates_data
+
+  launchers:
+    plugin: dump
+    source: snap/local
