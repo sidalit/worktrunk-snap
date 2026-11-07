@@ -77,10 +77,8 @@ parts:
   git:
     plugin: nil
     build-attributes: [enable-patchelf]
-    stage-slices:
-      - git_bins
-      - git_http-support
-      - ca-certificates_data
+    stage-packages:
+      - git
 
   launchers:
     plugin: dump
