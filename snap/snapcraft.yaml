@@ -58,7 +58,7 @@ parts:
     source: https://github.com/max-sixty/worktrunk.git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     source-depth: 1
-    rust-channel: '1.98.0'
+    rust-channel: stable
     rust-cargo-parameters:
       - --bin=wt
       - --profile=dist
