@@ -72,7 +72,7 @@ parts:
     override-build: |
       craftctl default
       strip "$CRAFT_PART_INSTALL/bin/wt"
-      install -Dm644 LICENSE "$CRAFT_PART_INSTALL/share/doc/worktrunk/LICENSE"
+      install -Dm644 -t "$CRAFT_PART_INSTALL/share/doc/worktrunk" LICENSE*
 
   git:
     plugin: nil
